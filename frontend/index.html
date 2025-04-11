@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CloudHSM Demo Portal</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- MAIN SCREEN -->
+  <div class="container" id="main-screen">
+    <h1 class="title">CloudHSM Demo Portal</h1>
+    <p class="subtitle">Upload, encrypt, and decrypt your files securely.</p>
+    <div class="button-group">
+      <button class="btn upload" onclick="showScreen('upload-screen')">Upload</button>
+      <button class="btn encrypt" onclick="showScreen('encrypt-screen')">Encrypt</button>
+      <button class="btn decrypt" onclick="showScreen('decrypt-screen')">Decrypt</button>
+    </div>
+    <div class="disclaimer">
+      All operations are processed locally using secure cloud HSM integration.
+    </div>
+  </div>
+
+  <!-- UPLOAD SCREEN -->
+  <div class="container" id="upload-screen" style="display: none;">
+    <h2 class="title">Upload File</h2>
+    <p class="subtitle">Select a file to upload.</p>
+    <input type="file" />
+    <br><br>
+    <button class="btn" onclick="showScreen('main-screen')">Back</button>
+  </div>
+
+  <!-- ENCRYPT SCREEN -->
+  <div class="container" id="encrypt-screen" style="display: none;">
+    <h2 class="title">Encrypt Files</h2>
+    <p class="subtitle">Choose files to encrypt securely.</p>
+    <input type="file" />
+    <br><br>
+    <button class="btn" onclick="showScreen('main-screen')">Back</button>
+  </div>
+
+  <!-- DECRYPT SCREEN -->
+  <div class="container" id="decrypt-screen" style="display: none;">
+    <h2 class="title">Decrypt Files</h2>
+    <p class="subtitle">Upload your encrypted payload to decrypt.</p>
+    <input type="file" />
+    <br><br>
+    <button class="btn" onclick="showScreen('main-screen')">Back</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
