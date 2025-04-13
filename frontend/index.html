@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CloudHSM Demo Portal</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-
   <!-- MAIN SCREEN -->
   <div class="container" id="main-screen">
     <h1 class="title">CloudHSM Demo Portal</h1>
@@ -26,26 +25,36 @@
   <div class="container" id="upload-screen" style="display: none;">
     <h2 class="title">Upload File</h2>
     <p class="subtitle">Select a file to upload.</p>
-    <input type="file" />
-    <br><br>
+    <input type="file" id="upload-input" />
+    <br /><br />
+    <button class="btn" onclick="handleUpload()">Upload</button>
+    <br /><br />
     <button class="btn" onclick="showScreen('main-screen')">Back</button>
   </div>
 
   <!-- ENCRYPT SCREEN -->
   <div class="container" id="encrypt-screen" style="display: none;">
     <h2 class="title">Encrypt Files</h2>
-    <p class="subtitle">Choose files to encrypt securely.</p>
-    <input type="file" />
-    <br><br>
+    <p class="subtitle">Choose a file to encrypt from uploads.</p>
+    <select id="encrypt-dropdown" class="file-dropdown">
+      <option disabled selected>Select a file</option>
+    </select>
+    <br /><br />
+    <button class="btn" onclick="encryptSelectedFile()">Encrypt</button>
+    <br /><br />
     <button class="btn" onclick="showScreen('main-screen')">Back</button>
   </div>
 
   <!-- DECRYPT SCREEN -->
   <div class="container" id="decrypt-screen" style="display: none;">
     <h2 class="title">Decrypt Files</h2>
-    <p class="subtitle">Upload your encrypted payload to decrypt.</p>
-    <input type="file" />
-    <br><br>
+    <p class="subtitle">Choose an encrypted payload to decrypt.</p>
+    <select id="decrypt-dropdown" class="file-dropdown">
+      <option disabled selected>Select a file</option>
+    </select>
+    <br /><br />
+    <button class="btn" onclick="decryptSelectedFile()">Decrypt</button>
+    <br /><br />
     <button class="btn" onclick="showScreen('main-screen')">Back</button>
   </div>
 
