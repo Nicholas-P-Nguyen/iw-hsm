@@ -1,6 +1,4 @@
 .env
 iw/
-requirements.txt
-startup.txt
 *.pyc
 __pycache__/
