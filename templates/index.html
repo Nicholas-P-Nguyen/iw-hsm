@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CloudHSM Demo Portal</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <!-- MAIN SCREEN -->
+  <div class="container" id="main-screen">
+    <h1 class="title">Azure HSM Demo Portal</h1>
+    <p class="subtitle">Upload, encrypt, and decrypt your files securely.</p>
+    <div class="button-group">
+      <button class="btn encrypt" onclick="showScreen('encrypt-screen')">Encrypt</button>
+      <button class="btn decrypt" onclick="showScreen('decrypt-screen')">Decrypt</button>
+    </div>
+    <div class="disclaimer">
+      All operations are processed locally using secure Azure Key Vault HSM integration.
+    </div>
+  </div>
+
+<!-- ENCRYPT SCREEN -->
+<div class="container" id="encrypt-screen" style="display: none;">
+  <h2 class="title">Encrypt File</h2>
+  <p class="subtitle">Upload a file to encrypt. You'll receive an encrypted payload to save.</p>
+  <input type="file" id="encrypt-input" />
+  <br /><br />
+  <button class="btn" onclick="encryptSelectedFile()">Encrypt</button>
+  <br /><br />
+  <button class="btn" id="download-payload-btn" style="display: none;">Download Payload</button>
+  <button class="btn" onclick="showScreen('main-screen')">Back</button>
+</div>
+
+<!-- DECRYPT SCREEN -->
+<div class="container" id="decrypt-screen" style="display: none;">
+  <h2 class="title">Decrypt Files</h2>
+  <p class="subtitle">Upload the payload you received after encryption.</p>
+  <input type="file" id="decrypt-input" accept=".json" />
+  <br /><br />
+  <button class="btn" onclick="decryptSelectedFile()">Decrypt</button>
+  <br /><br />
+  <button class="btn" id="download-decrypted-btn" style="display: none;">Download Decrypted File</button>
+  <br /><br />
+  <button class="btn" onclick="showScreen('main-screen')">Back</button>
+</div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

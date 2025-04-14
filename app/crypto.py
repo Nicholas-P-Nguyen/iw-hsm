@@ -8,16 +8,18 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-VAULT_URL = os.getenv("VAULT_URL")
+credential = DefaultAzureCredential()
+VAULT_URL = "https://COSIW11.vault.azure.net/"
 RSA_BIT_SIZE = int(os.getenv("RSA_BIT_SIZE", 2048))
 AES_BYTE_SIZE = int(os.getenv("AES_BYTE_SIZE", 32))
 IV_BYTE_SIZE = int(os.getenv("IV_BYTE_SIZE", 16))
 BLOCK_BIT_SIZE = int(os.getenv("BLOCK_BIT_SIZE", 128))
 MASTER_KEY = os.getenv("MASTER_KEY")
 
-# Creating instance of Azure's key client
-credential = DefaultAzureCredential()
-client = keys.KeyClient(vault_url=VAULT_URL, credential=credential)
+def get_key_client():
+    assert VAULT_URL and VAULT_URL.startswith("https://"), f"Invalid VAULT_URL: {VAULT_URL}"
+    return keys.KeyClient(vault_url=VAULT_URL, credential=DefaultAzureCredential()) 
+
 
 #-----------------------------------------------------------------------
 # Functions to create, get, disable, and delete keys.
@@ -26,26 +28,29 @@ client = keys.KeyClient(vault_url=VAULT_URL, credential=credential)
 # IMPORTANT: should only be called once by us to save money
 # Create a RSA key of any type 
 def create_RSA():
+    client = get_key_client()
     rsa_key = client.create_rsa_key(MASTER_KEY, size=RSA_BIT_SIZE)
     return rsa_key
 
 # Gets the master key
 def retrieve_master_key():
+    client = get_key_client()  
     rsa_key = client.get_key(MASTER_KEY)
     return rsa_key
 
 # IMPORTANT: Only call this when we know we're doing with this project
 # Deletes the master key
 def delete_key():
-    deleted_key = client.begin_delete_key(MASTER_KEY)
     # block until deletion is complete
+    client = get_key_client()  # CHANGED
+    deleted_key = client.begin_delete_key(MASTER_KEY)
     deleted_key.wait()
     return deleted_key
 
 # Disables key
 def disable_key():
+    client = get_key_client()  
     client.update_key_properties(MASTER_KEY, enabled=False)
-
 #-----------------------------------------------------------------------
 # Cryptographic operations helper functions
 #-----------------------------------------------------------------------
@@ -87,9 +92,6 @@ def unpad_data(padded_data: bytes):
 # Cryptographic operations
 #-----------------------------------------------------------------------
 
-# TODO: Decide if we want to give everythign to the user (ciphertext, encrypted key, & iv)
-# TODO: Maybe have a button asking user if they want to store this data in our database
-# TODO: If yes, we should encrypt them again with a master key
 def encrypt_data(file_bytes: bytes):
     # Generating random AES key
     aes_key = os.urandom(AES_BYTE_SIZE)
@@ -102,7 +104,7 @@ def encrypt_data(file_bytes: bytes):
     aes_encryptor = init_aes_context(aes_key, iv, True)
     cipher_text = aes_encryptor.update(padded_data) + aes_encryptor.finalize()
 
-    # Encrypting the AES key with RSA key
+    # Encrypting the AES key with RSA public key
     crypto_client = init_crypto_client()
     encrypted_aes_key = crypto_client.encrypt(crypto.EncryptionAlgorithm.rsa_oaep, aes_key).ciphertext
     
@@ -119,7 +121,7 @@ def encrypt_data(file_bytes: bytes):
 def decrypt_data(payload: dict):
     encrypted_aes_key, iv, ciphertext = unpack_payload(payload)
 
-    # Decrypting AES key with RSA key
+    # Decrypting AES key with RSA private key
     crypto_client = init_crypto_client()
     aes_key = crypto_client.decrypt(crypto.EncryptionAlgorithm.rsa_oaep, encrypted_aes_key).plaintext
 
