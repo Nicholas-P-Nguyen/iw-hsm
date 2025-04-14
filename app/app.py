@@ -24,7 +24,7 @@ def encrypt():
         return "No file uploaded", 400
     
     file_bytes = file.read()
-    payload = crypto.encrypt_data(file_bytes)
+    payload = crypto.encrypt_data(file_bytes, file.filename, file.mimetype)
     return jsonify(payload)
     
 @app.route('/decrypt', methods=["POST"])
@@ -35,10 +35,10 @@ def decrypt():
     
     try:
         payload = json.load(file)
-        decrypted_data = crypto.decrypt_data(payload)
+        decrypted_data, filename, mimetype = crypto.decrypt_data(payload)
         return decrypted_data, 200, {
-            'Content-Type': 'application/octet-stream',
-            'Content-Disposition': 'attachment; filename="decrypted_output"'
+            'Content-Type': mimetype,
+            'Content-Disposition': f'attachment; filename="{filename}"'
         }
     except Exception as e:
         return f"Decryption failed: {str(e)}", 500

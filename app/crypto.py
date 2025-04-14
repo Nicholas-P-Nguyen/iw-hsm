@@ -75,7 +75,9 @@ def unpack_payload(payload: dict):
     encrypted_aes_key = base64.b64decode(payload["encrypted_aes_key"])
     iv = base64.b64decode(payload["iv"])
     ciphertext = base64.b64decode(payload["ciphertext"])
-    return encrypted_aes_key, iv, ciphertext
+    filename = payload.get("filename", "decrypted_output")
+    mimetype = payload.get("mimetype", "application/octet-stream")
+    return encrypted_aes_key, iv, ciphertext, filename, mimetype
 
 # AES (CBC mode) requires input to be a multiple of 128 bits
 def pad_data(data: bytes):
@@ -92,7 +94,7 @@ def unpad_data(padded_data: bytes):
 # Cryptographic operations
 #-----------------------------------------------------------------------
 
-def encrypt_data(file_bytes: bytes):
+def encrypt_data(file_bytes: bytes, filename: str, mimetype: str):
     # Generating random AES key
     aes_key = os.urandom(AES_BYTE_SIZE)
     # Random salt for encryption
@@ -111,6 +113,8 @@ def encrypt_data(file_bytes: bytes):
     # TODO: add a check here to see if client wants us to store a backup in our database
     # Client needs to keep encrypted key, IV, and ciphertext safe to decrypt their data
     payload = {
+        "filename": filename,
+        "mimetype": mimetype,
         "encrypted_aes_key": base64.b64encode(encrypted_aes_key).decode(),
         "iv": base64.b64encode(iv).decode(),
         "ciphertext": base64.b64encode(cipher_text).decode()
@@ -119,7 +123,7 @@ def encrypt_data(file_bytes: bytes):
     return payload
 
 def decrypt_data(payload: dict):
-    encrypted_aes_key, iv, ciphertext = unpack_payload(payload)
+    encrypted_aes_key, iv, ciphertext, filename, mimetype = unpack_payload(payload)
 
     # Decrypting AES key with RSA private key
     crypto_client = init_crypto_client()
@@ -131,4 +135,4 @@ def decrypt_data(payload: dict):
 
     data = unpad_data(padded_data)
 
-    return data
+    return data, filename, mimetype
